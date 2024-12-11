@@ -1,0 +1,74 @@
+Métodos de la API
+
+1. Creación de un rol
+Ruta: post localhost:8080/api/role
+Body:
+{
+    "name": "ADMIN"
+}
+Respuesta:
+{
+    "code":201,
+    "message":"Rol registrado correctamente",
+    "status":"CREATED"
+}
+Nota: La creación de roles se hará automáticamente al iniciar la aplicación, por lo que no es necesario crearlos manualmente. (Archivo DataInitializer en el paquete utils)
+
+2. Creación de un tipo de evento
+Ruta: post localhost:8080/api/type
+Body:
+{
+    "name": "LIMPIEZA"
+}
+Respuesta:
+{
+    "code":201,
+    "message":"Tipo de evento registrado correctamente",
+    "status":"CREATED"
+}
+
+
+3. Creación de un grupo
+Ruta: post localhost:8080/api/group
+Body:
+{
+    "name":"Limpieza",
+    "municipality":"Zapata",
+    "neighborhood":"zapatata"
+}
+Respuesta:
+{
+    "code":201,
+    "message":"Grupo registrado correctamente",
+    "status":"CREATED"
+}
+Nota 1: Para poder crear un grupo, es necesario que exista al menos un tipo de evento registrado.
+Nota 2: La creación de un grupo necesita de un admin, sin embargo al iniciarlo no poseerá uno (Hasta que se actualice con el admin dado)
+Nota 3: Al igual que con el admin, el grupo requiere una lista de usuarios la cual se irá agregando según se registren nuevos usuarios. (Se agrega un método para agregar usuario).
+
+
+REGISTRO:
+Ruta: post localhost:8080/api/user
+Body:
+{
+    "name": "Juan",
+    "lastname": "Bodoque",
+    "phone": "1231231231",
+    "email": "juancarlosbodoque@example.com",
+    "username": "juan carlos",
+    "password": "123",
+    "group": {
+        "id": 1
+    },
+    "role": {
+        "id": 1
+    }
+}
+
+
+Ruta: get localhost:8080/api/auth/login
+Body:
+{
+    "username": "admin",
+    "password": "admin"
+}

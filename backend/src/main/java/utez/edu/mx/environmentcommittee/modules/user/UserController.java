@@ -27,12 +27,12 @@ public class UserController {
         return userService.findById(id);
     }
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<?> save(@RequestBody User user) {
         return userService.save(user);
     }
 
-    @PutMapping("")
+    @PutMapping
     public ResponseEntity<?> update(@RequestBody User user) {
         return userService.update(user);
     }

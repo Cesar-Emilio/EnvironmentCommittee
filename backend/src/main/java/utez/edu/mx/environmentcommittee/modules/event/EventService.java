@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import utez.edu.mx.environmentcommittee.modules.type.TypeRepository;
 import utez.edu.mx.environmentcommittee.utils.CustomResponseEntity;
 
 import java.sql.SQLException;
@@ -16,6 +17,9 @@ public class EventService {
 
     @Autowired
     private CustomResponseEntity customResponseEntity;
+
+    @Autowired
+    private TypeRepository typeRepository;
 
     // BRING ALL EVENTS
     public ResponseEntity<?> findAll() {
@@ -39,11 +43,28 @@ public class EventService {
 
     // SAVE EVENT
     @Transactional(rollbackFor = {SQLException.class, Exception.class})
-    public ResponseEntity<?> save(Event event) {
+    public ResponseEntity<?> save(EventDTO dto) {
         try {
+
+            //Validación de los datos del DTO
+            if (!isDTOValid(dto)) {
+                return customResponseEntity.get400Response();
+            }
+
+            Event event = new Event();
+            event.setTitle(dto.getTitle());
+            event.setDate(dto.getDate());
+
+            if (!isTypeValid(dto.getTypeId())) {
+                return customResponseEntity.get400Response();
+            }
+            event.setType(typeRepository.findById(dto.getTypeId()).get());
+
             // Si el estado no se envía, asignar "Próximamente" como predeterminado
-            if (event.getStatus() == null || event.getStatus().isEmpty()) {
+            if (dto.getStatus() == null || dto.getStatus().isEmpty()) {
                 event.setStatus("Próximamente");
+            } else {
+                event.setStatus(dto.getStatus());
             }
             eventRepository.save(event);
             return customResponseEntity.getOkResponse("Evento registrado correctamente", "CREATED", 201, null);
@@ -55,11 +76,31 @@ public class EventService {
 
 
     // UPDATE EVENT
-    public ResponseEntity<?> update(Event event) {
-        if (!eventRepository.existsById(event.getId())) {
+    public ResponseEntity<?> update(EventDTO dto, Long id) {
+        Event event = eventRepository.findById(id).orElse(null);
+        if (event == null) {
             return customResponseEntity.get404Response();
         }
+
+        //Colocar datos en caso de tenerlos
+        if (dto.getTitle() != null && !dto.getTitle().isEmpty()) {
+            event.setTitle(dto.getTitle());
+        }
+        if (dto.getDate() != null) {
+            event.setDate(dto.getDate());
+        }
+        if (dto.getTypeId() != null && dto.getTypeId() > 0) {
+            if (!isTypeValid(dto.getTypeId())) {
+                return customResponseEntity.get400Response();
+            }
+            event.setType(typeRepository.findById(dto.getTypeId()).get());
+        }
+        if (dto.getStatus() != null && !dto.getStatus().isEmpty()) {
+            event.setStatus(dto.getStatus());
+        }
+
         eventRepository.save(event);
+
         return customResponseEntity.getOkResponse("Evento actualizado correctamente", "OK", 200, null);
     }
 
@@ -86,5 +127,16 @@ public class EventService {
         }
         eventRepository.deleteById(id);
         return customResponseEntity.getOkResponse("Evento eliminado correctamente", "OK", 200, null);
+    }
+
+    // VALIDATE DTO
+    private boolean isDTOValid(EventDTO dto) {
+        return dto.getTitle() != null && !dto.getTitle().isEmpty() &&
+                dto.getDate() != null && dto.getTypeId() != null && dto.getTypeId() > 0;
+    }
+
+    // VALIDATE TYPE
+    private boolean isTypeValid(long typeId) {
+        return typeRepository.existsById(typeId);
     }
 }
