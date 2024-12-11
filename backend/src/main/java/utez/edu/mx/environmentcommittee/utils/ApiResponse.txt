@@ -94,3 +94,32 @@ Respuesta:
 }
 
 Nota: El evento se crea sin usuarios, es el usuario el que se actualiza para poder unirse a un evento.
+
+6. Iniciar sesión
+Ruta: post localhost:8080/api/login
+Body:
+{
+    "user": "DiteRuiz", //Funciona también con el correo
+    "password": "123"
+}
+Respuesta:
+{
+  "code": 200,
+  "data": {
+    "user": {
+      "role": {
+        "id": 1,
+        "name": "ADMIN"
+      },
+      "phone": "1234567890",
+      "name": "Aldo",
+      "id": 3,
+      "email": "20233tn001@utez.edu.mx",
+      "lastname": "Ruiz",
+      "username": "DiteRuiz"
+    },
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJEaXRlUnVpeiIsImV4cCI6MTczMzk0NDMyNCwiaWF0IjoxNzMzOTA4MzI0fQ.QSSiFXpj1u44k3WcK7jADgIxrJXfWgjPJuPdAUKn4fE"
+  },
+  "message": "Inicio de sesión exitoso",
+  "status": "OK"
+}

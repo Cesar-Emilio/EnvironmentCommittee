@@ -35,14 +35,12 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseEntity<?> login(AuthLoginDTO authLoginDTO){
+    public ResponseEntity<?> login(AuthLoginDTO authLoginDTO) {
         User found = userRepository.findByEmailOrUsername(authLoginDTO.getUser()).orElse(null);
 
-        if (found == null){
+        if (found == null) {
             return customResponseEntity.get404Response("El usuario no encontrado");
         } else {
-
-            //Validar la contraseña usando matches
             if (!passwordEncoder.matches(authLoginDTO.getPassword(), found.getPassword())) {
                 return customResponseEntity.get401Response();
             }
@@ -50,35 +48,37 @@ public class AuthService {
             try {
                 UserDetails userDetails = new UserDetailsImpl(found);
 
-                //Generar el token
                 String jwt = jwtUtil.generateToken(userDetails);
 
-                //Obtener atributos del token generado
+                Map<String, Object> userResponse = new HashMap<>();
+                userResponse.put("id", found.getId());
+                userResponse.put("name", found.getName());
+                userResponse.put("lastname", found.getLastname());
+                userResponse.put("username", found.getUsername());
+                userResponse.put("email", found.getEmail());
+                userResponse.put("phone", found.getPhone());
+                userResponse.put("role", found.getRole());
+
+                if (found.getGroup() != null) {
+                    userResponse.put("group", found.getGroup());
+                }
+
                 Map<String, Object> response = new HashMap<>();
                 response.put("token", jwt);
-                response.put("user", Map.of(
-                        "id", found.getId(),
-                        "name", found.getName(),
-                        "lastname", found.getLastname(),
-                        "username", found.getUsername(),
-                        "email", found.getEmail(),
-                        "group", found.getGroup(),
-                        "phone", found.getPhone(),
-                        "role", found.getRole(),
-                        "pass", found.getPassword()
-                ));
+                response.put("user", userResponse);
 
                 return customResponseEntity.getOkResponse(
-                        "Inicio de sesion exitoso",
+                        "Inicio de sesión exitoso",
                         "OK",
                         200,
                         response
                 );
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
                 return customResponseEntity.get400Response();
             }
         }
     }
+
 }
