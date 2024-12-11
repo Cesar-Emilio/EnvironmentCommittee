@@ -69,7 +69,7 @@ Body:
     "name": "Limpieza",
     "municipality": "Zapata",
     "neighborhood": "zapatata",
-    "adminId": "3" //Se usa 3 pq ya lo repetí varias veces
+    "adminId": "1"
 }
 Respuesta:
 {
@@ -121,5 +121,136 @@ Respuesta:
     "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJEaXRlUnVpeiIsImV4cCI6MTczMzk0NDMyNCwiaWF0IjoxNzMzOTA4MzI0fQ.QSSiFXpj1u44k3WcK7jADgIxrJXfWgjPJuPdAUKn4fE"
   },
   "message": "Inicio de sesión exitoso",
+  "status": "OK"
+}
+
+
+// OBTENER INFORMACIÓN DE LA BASE DE DATOS
+
+1. Obtener todos los roles
+Ruta: get localhost:8080/api/role
+Respuesta:
+{
+  "code": 200,
+  "data": [
+    {
+      "id": 1,
+      "name": "ADMIN"
+    },
+    {
+      "id": 2,
+      "name": "ADMINGROUP"
+    },
+    {
+      "id": 3,
+      "name": "MEMBER"
+    }
+  ],
+  "message": "Roles encontrados",
+  "status": "OK"
+}
+
+2. Obtener todos los tipos de evento
+Ruta: get localhost:8080/api/type
+Respuesta:
+{
+  "code": 200,
+  "data": [
+    {
+      "id": 1,
+      "name": "LIMPIEZA"
+    }
+  ],
+  "message": "Tipos de eventos encontrados",
+  "status": "OK"
+}
+
+3. Obtener todos los usuarios
+Ruta: get localhost:8080/api/user
+{
+  "code": 200,
+  "data": [
+    {
+      "id": 1,
+      "name": "Admin",
+      "lastname": "Admin",
+      "phone": "1234567890",
+      "email": "admin@admin.com",
+      "username": "admin",
+      "password": "$2a$10$GwUxBhs.f1mFPgEbwTRYVOxikmvH8KJsNZNyZKCNfXVXxYIRPBY.u",
+      "group": null,
+      "role": {
+        "id": 1,
+        "name": "ADMIN"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Aldo",
+      "lastname": "Ruiz",
+      "phone": "1234567890",
+      "email": "20233tn001@utez.edu.mx",
+      "username": "DiteRuiz",
+      "password": "$2a$10$jT3vVEGqFIvET5B50RV5cOzrU/cP.5/GB9E/hZgD4l6rbYeAUFp2a",
+      "group": null,
+      "role": {
+        "id": 1,
+        "name": "ADMIN"
+      }
+    }
+  ],
+  "message": "Usuarios encontrados",
+  "status": "OK"
+}
+
+//NOTA: Se hace en base al data initializer que genera al administrador y al usuario registrado anteriormente
+
+4. Obtener todos los grupos
+Ruta: get localhost:8080/api/group
+{
+  "code": 200,
+  "data": [
+    {
+      "id": 1,
+      "name": "Limpieza",
+      "municipality": "Zapata",
+      "neighborhood": "zapatata",
+      "admin": {
+        "id": 1,
+        "name": "Admin",
+        "lastname": "Admin",
+        "phone": "1234567890",
+        "email": "admin@admin.com",
+        "username": "admin",
+        "password": "$2a$10$GwUxBhs.f1mFPgEbwTRYVOxikmvH8KJsNZNyZKCNfXVXxYIRPBY.u",
+        "group": null,
+        "role": {
+          "id": 1,
+          "name": "ADMIN"
+        }
+      }
+    }
+  ],
+  "message": "Grupos encontrados",
+  "status": "OK"
+}
+
+5. Obtener todos los eventos
+Ruta: get localhost:8080/api/event
+{
+  "code": 200,
+  "data": [
+    {
+      "id": 1,
+      "title": "Limpiar D4",
+      "date": "2024-12-10",
+      "status": "Próximamente",
+      "type": {
+        "id": 1,
+        "name": "LIMPIEZA"
+      }
+    }
+  ],
+  "message": "Eventos encontrados",
   "status": "OK"
 }
