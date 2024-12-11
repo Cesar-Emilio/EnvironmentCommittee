@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestión de Grupos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body>
+    <!-- Navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img src="../icons/ECO_VIDA_icon.png" alt="Logo" style="width: 2.5em; height: 2.5em;">
+          Comité Ambiental
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="#"><i class="bi bi-house-door"></i> Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"><i class="bi bi-person-fill"></i> Perfil</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                <i class="bi bi-tree-fill"></i> Acciones
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="./admins.html"><i class="bi bi-person-badge"></i> Administradores</a></li>
+                <li><a class="dropdown-item" href="./groups.html"><i class="bi bi-people"></i> Grupos</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="#"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Botón agregar grupo -->
+    <div class="container mt-4 text-end">
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addGroupModal">
+        <i class="bi bi-person-plus-fill"></i> Agregar Grupo
+      </button>
+    </div>
+
+    <!-- Tabla de grupos -->
+    <div class="container mt-4">
+      <div class="table-responsive">
+        <caption>Lista de grupos</caption>
+        <table class="table table-striped align-middle mt-3">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Administrador</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- La tabla se carga dinámicamente desde JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal: Agregar Grupo -->
+    <div class="modal fade" id="addGroupModal" tabindex="-1" aria-labelledby="addGroupModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addGroupModalLabel">Agregar Grupo</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="addGroupName" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="addGroupName" placeholder="Nombre del grupo">
+              </div>
+              <div class="mb-3">
+                <label for="addGroupMunicipio" class="form-label">Municipio</label>
+                <input type="text" class="form-control" id="addGroupMunicipio" placeholder="Municipio">
+              </div>
+              <div class="mb-3">
+                <label for="addGroupNeighborhood" class="form-label">Colonia</label>
+                <input type="text" class="form-control" id="addGroupNeighborhood" placeholder="Colonia">
+              </div>
+              <div class="mb-3">
+                <label for="addAdminGroup" class="form-label">Seleccionar Administrador</label>
+                <select class="form-select" id="addAdminGroup"></select>
+                <button class="btn btn-outline-success mt-2" type="button" onclick="loadAdmins()">Cargar Administradores</button>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-success" onclick="saveGroup()">Registrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Editar Grupo -->
+    <div class="modal fade" id="editGroupModal" tabindex="-1" aria-labelledby="editGroupModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editGroupModalLabel">Editar Grupo</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="editGroupName" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="editGroupName" placeholder="Nombre del grupo">
+              </div>
+              <div class="mb-3">
+                <label for="editGroupMunicipio" class="form-label">Municipio</label>
+                <input type="text" class="form-control" id="editGroupMunicipio" placeholder="Municipio">
+              </div>
+              <div class="mb-3">
+                <label for="editGroupNeighborhood" class="form-label">Colonia</label>
+                <input type="text" class="form-control" id="editGroupNeighborhood" placeholder="Colonia">
+              </div>
+              <div class="mb-3">
+                <label for="editAdminName" class="form-label">Administrador</label>
+                <!-- Campo para mostrar el nombre del administrador (readonly) -->
+                <input type="text" class="form-control" id="editAdminName" readonly>
+            
+                <!-- Campo oculto para enviar el ID del administrador -->
+                <input type="hidden" id="editAdminId">
+            </div>                               
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-success" onclick="saveGroupChanges()">Guardar cambios</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Ver Grupo -->
+    <div class="modal fade" id="viewGroupModal" tabindex="-1" aria-labelledby="viewGroupModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="viewGroupModalLabel">Detalles del Grupo</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Detalles del grupo se actualizan dinámicamente desde JavaScript -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../utils/alerts.js"></script>
+    <script src="../utils/groups.js"></script>
+  </body>
+</html>

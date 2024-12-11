@@ -1,0 +1,266 @@
+
+/* ------------------CSS STYLES FOR MENU---------------------- */
+.navbarMenu{
+    background-color: #117554;
+}
+
+.actionMenu:hover{
+    cursor: pointer;
+    background-color: #27b485;
+    transition: 0.5s;
+}
+
+
+
+/* ------------------CSS STYLES FOR TABLE---------------------- */
+
+.headersTable{
+    color: #674636 !important;
+    font-family: Cambria;
+    font-size:x-large;
+    text-align: center;
+}
+
+.dataTable{
+    color: #1A3636 !important;
+    font-family: sans-serif;
+    text-align: center;
+}
+
+
+/* ------------------CSS STYLES FOR MODALS---------------------- */
+.modalTittle{
+    color: #1A3636 ;
+    font-weight: bold;
+}
+.labelModal{
+    color: #1A3636;
+    font-style: bold !important;
+    font-size: large;
+    font-weight: 500;
+}
+.inputModal{
+    font-size: small;
+    font-style: italic;
+}
+.btn-cancelModal{
+    background-color: #c5c2c3;
+}
+.btn-cancelModal:hover{
+    cursor: pointer;
+    background-color: #b5b0b1 !important;
+    transition: 0.5s;
+}
+.btn-actionModal:hover{
+    cursor: pointer;
+    background-color: #6dac57 !important;
+    transition: 0.5s;
+}
+.btn-actionModal{
+    background-color: #88C273;
+}
+
+/* BUTTON ADD TO CALENDAR */
+
+  /* -------------------ADD BUTTONS */
+  .addButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 9px 12px;
+    gap: 8px;
+    height: 40px;
+    width: 250px;
+    border: none;
+    background: #34cf9c;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.lable {
+    line-height: 22px;
+    font-size: 17px;
+    color: #fff;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+}
+
+.addButton:hover {
+    background: #60d8b0;
+    color: #117554;
+}
+
+.addButton .svg-icon {
+    transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.addButton:hover .svg-icon {
+    transform: rotate(20deg) scale(1.1);
+    color: #ffffff;
+}
+
+/* USERS */
+/* ACCEPT EVENT BUTTON 
+.confirmEventbutton {
+    padding: 15px 25px;
+    border: unset;
+    border-radius: 15px;
+    color: #e8e8e8;
+    z-index: 1;
+    background: #34cf9c;
+    position: relative;
+    font-weight: 1000;
+    font-size: 10px;
+    -webkit-box-shadow: 4px 8px 19px -3px rgba(0,0,0,0.27);
+    box-shadow: 4px 8px 19px -3px rgba(0,0,0,0.27);
+    transition: all 250ms;
+    overflow: hidden;
+  }
+  
+  .confirmEventbutton::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    border-radius: 15px;
+    background-color: #e8e8e8;
+    z-index: -1;
+    -webkit-box-shadow: 4px 8px 19px -3px rgba(255, 255, 255, 0.27);
+    box-shadow: 4px 8px 19px -3px rgba(255, 255, 255, 0.27);
+    transition: all 250ms
+  }
+  
+  .confirmEventbutton:hover {
+    color: #064f4f;
+  }
+  
+  .confirmEventbutton:hover::before {
+    width: 100%;
+  }
+*/
+  /* DECLINE EVENT BUTTON 
+.declineEventbutton {
+    padding: 15px 25px;
+    border: unset;
+    border-radius: 15px;
+    color: #e8e8e8;
+    z-index: 1;
+    background: #424846;
+    position: relative;
+    font-weight: 1000;
+    font-size: 10px;
+    -webkit-box-shadow: 4px 8px 19px -3px rgba(0,0,0,0.27);
+    box-shadow: 4px 8px 19px -3px rgba(0,0,0,0.27);
+    transition: all 250ms;
+    overflow: hidden;
+  }
+  
+  .declineEventbutton::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    border-radius: 15px;
+    background-color: #e8e8e8;
+    z-index: -1;
+    -webkit-box-shadow: 4px 8px 19px -3px rgba(255, 255, 255, 0.27);
+    box-shadow: 4px 8px 19px -3px rgba(255, 255, 255, 0.27);
+    transition: all 250ms
+  }
+  
+  .declineEventbutton:hover {
+    color: #064f4f;
+  }
+  
+  .declineEventbutton:hover::before {
+    width: 100%;
+  }
+*/
+
+.confirmEventbutton {
+  padding: 1.3em 3em;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: #000;
+  background-color: #88C273;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+}
+
+.confirmEventbutton:hover {
+  background-color: #6dac57;
+  box-shadow: 0px 15px 20px #99c688;
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+.confirmEventbutton:active {
+  transform: translateY(-1px);
+}
+
+.declineEventbutton {
+  padding: 1.3em 3em;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: #000;
+  background-color: #c5c2c3;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+}
+
+.declineEventbutton:hover {
+  background-color: #b5b0b1;
+  box-shadow: 0px 15px 20px #bab5b6;
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+.declineEventbutton:active {
+  transform: translateY(-1px);
+}
+
+/* CARDS FOR EVENTS - USERS------------------------- */
+.cardEvent-text{
+  color: #1A3636;
+  font-weight: 200;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.cardEvent-text-sub{
+  color: #0c5f44;
+  font-weight: 400;
+  font-family: monospace;
+}
+.cardEvent:hover{
+  background-color: #e0f8da;
+  transform: translateY(-5px);
+}
+
+.cardEvent:hover .icon-card,
+.cardEvent:hover .card-title{
+  color: #0c5f44 !important;
+}
+
+.cardEvent{
+  width: 22rem;
+  height: 18rem;
+  transition: all 0.3s;
+}
+
+

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestion de Miembros</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://kit.fontawesome.com/d137dd6862.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body>
+
+    <!-- Menú de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+      <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+              <img src="../icons/ECO_VIDA_icon.png" alt="Logo" style="width: 2.5em; height: 2.5em;">
+              Comité Ambiental
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav me-auto">
+                  <li class="nav-item">
+                      <a class="nav-link active" href="#"><i class="bi bi-house-door"></i> Home</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="#"><i class="bi bi-person-fill"></i> Perfil</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                          <i class="bi bi-tree-fill"></i> Acciones
+                      </a>
+                      <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="./events.html"><i class="bi bi-calendar2-week"></i> Eventos</a></li>
+                          <li><a class="dropdown-item" href="./members.html"><i class="bi bi-people"></i> Miembros</a></li>
+                          <li><a class="dropdown-item" href="./typeEvent.html"><i class="bi bi-tags"></i> Tipos</a></li>
+                      </ul>
+                  </li>
+              </ul>
+              <ul class="navbar-nav">
+                  <li class="nav-item">
+                      <a class="nav-link" href="#"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </nav>    
+
+    <!-- Botón para agregar usuario -->
+<div class="container mt-4">
+  <div class="d-flex justify-content-end">
+      <button type="button" class="btn btn-success text-light" data-bs-toggle="modal" data-bs-target="#addUserModal">
+          <i class="bi bi-person-fill-add"></i> Agregar usuario
+      </button>
+  </div>
+</div>
+
+    <!-- Tabla de usuarios -->
+    <div class="container mt-5">
+      <caption>Lista de miembros</caption>
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Apellidos</th>
+              <th>Nombre de usuario</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#viewUserModal">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editUserModal">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-danger" onclick="confirmDelete('Valeria Ventura Gil')">
+                  <i class="bi bi-person-dash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+<!-- Modal para agregar usuario -->
+<div class="modal fade" id="addUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Registro de Usuario</h5>
+      </div>
+      <form>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="addUserName" class="form-label">Nombre:</label>
+            <input type="text" class="form-control" id="addUserName" placeholder="Nombre">
+          </div>
+          <div class="mb-3">
+            <label for="addUserLastname" class="form-label">Apellidos:</label>
+            <input type="text" class="form-control" id="addUserLastname" placeholder="Apellidos">
+          </div>
+          <div class="mb-3">
+            <label for="addUserPhone" class="form-label">Número telefónico:</label>
+            <input type="text" class="form-control" id="addUserPhone" placeholder="Número telefónico">
+          </div>
+          <div class="mb-3">
+            <label for="addUserEmail" class="form-label">Correo electrónico:</label>
+            <input type="email" class="form-control" id="addUserEmail" placeholder="Correo electrónico">
+          </div>
+          <div class="mb-3">
+            <label for="addUserUsername" class="form-label">Nombre de Usuario:</label>
+            <input type="text" class="form-control" id="addUserUsername" placeholder="Nombre de Usuario">
+          </div>
+          <div class="mb-3">
+            <label for="addUserPassword" class="form-label">Contraseña:</label>
+            <input type="password" class="form-control" id="addUserPassword" placeholder="Contraseña">
+          </div>
+          <!-- Rol predeterminado oculto -->
+          <input type="hidden" id="addUserRoleId" value="2">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+    <!-- Modal para editar usuario -->
+<div class="modal fade" id="editUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Usuario</h5>
+      </div>
+      <form>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="editUserName" class="form-label">Nombre:</label>
+            <input type="text" class="form-control" id="editUserName" placeholder="Nombre">
+          </div>
+          <div class="mb-3">
+            <label for="editUserLastname" class="form-label">Apellidos:</label>
+            <input type="text" class="form-control" id="editUserLastname" placeholder="Apellidos">
+          </div>
+          <div class="mb-3">
+            <label for="editUserUsername" class="form-label">Nombre de Usuario:</label>
+            <input type="text" class="form-control" id="editUserUsername" placeholder="Nombre de Usuario">
+          </div>        
+          <div class="mb-3">
+            <label for="editUserPhone" class="form-label">Número telefónico:</label>
+            <input type="text" class="form-control" id="editUserPhone" placeholder="Número telefónico">
+          </div>
+          <div class="mb-3">
+            <label for="editUserEmail" class="form-label">Correo electrónico:</label>
+            <input type="email" class="form-control" id="editUserEmail" placeholder="Correo electrónico">
+          </div>
+          <div class="mb-3">
+            <label for="editUserPassword" class="form-label">Contraseña:</label>
+            <input type="password" class="form-control" id="editUserPassword" placeholder="Contraseña">
+          </div>
+          <!-- Campo Rol (solo lectura) -->
+          <div class="mb-3">
+            <label for="editUserRole" class="form-label">Rol:</label>
+            <select class="form-select" id="editUserRole" disabled>
+              <option value="2" selected>Member</option>
+          </select>          
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+    <!-- Modal para ver usuario -->
+<div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewUserModalLabel">Detalles del Usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Aquí se cargarán los datos del usuario dinámicamente -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../utils/alerts.js"></script>
+    <script src="../utils/members.js"></script>
+  </body>
+</html>
