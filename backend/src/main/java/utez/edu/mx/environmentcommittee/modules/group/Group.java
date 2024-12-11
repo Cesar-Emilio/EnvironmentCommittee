@@ -24,7 +24,6 @@ public class Group {
     private String neighborhood;
 
     @OneToMany(mappedBy = "group")
-    @JsonIgnore
     private List<User> users;
 
     @OneToOne

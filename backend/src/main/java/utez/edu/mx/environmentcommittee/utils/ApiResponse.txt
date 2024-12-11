@@ -178,7 +178,6 @@ Ruta: get localhost:8080/api/user
       "email": "admin@admin.com",
       "username": "admin",
       "password": "$2a$10$GwUxBhs.f1mFPgEbwTRYVOxikmvH8KJsNZNyZKCNfXVXxYIRPBY.u",
-      "group": null,
       "role": {
         "id": 1,
         "name": "ADMIN"
@@ -192,7 +191,6 @@ Ruta: get localhost:8080/api/user
       "email": "20233tn001@utez.edu.mx",
       "username": "DiteRuiz",
       "password": "$2a$10$jT3vVEGqFIvET5B50RV5cOzrU/cP.5/GB9E/hZgD4l6rbYeAUFp2a",
-      "group": null,
       "role": {
         "id": 1,
         "name": "ADMIN"
@@ -215,6 +213,7 @@ Ruta: get localhost:8080/api/group
       "name": "Limpieza",
       "municipality": "Zapata",
       "neighborhood": "zapatata",
+      "users": [],
       "admin": {
         "id": 1,
         "name": "Admin",
@@ -223,7 +222,6 @@ Ruta: get localhost:8080/api/group
         "email": "admin@admin.com",
         "username": "admin",
         "password": "$2a$10$GwUxBhs.f1mFPgEbwTRYVOxikmvH8KJsNZNyZKCNfXVXxYIRPBY.u",
-        "group": null,
         "role": {
           "id": 1,
           "name": "ADMIN"
