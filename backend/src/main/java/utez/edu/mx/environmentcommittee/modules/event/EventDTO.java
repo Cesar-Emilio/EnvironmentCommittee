@@ -16,17 +16,15 @@ public class EventDTO {
 
     private String status;
 
-    private List<Long> usersId;
 
     public EventDTO() {
     }
 
-    public EventDTO(String title, Date date, Long typeId, String status, List<Long> usersId) {
+    public EventDTO(String title, Date date, Long typeId, String status) {
         this.title = title;
         this.date = date;
         this.typeId = typeId;
         this.status = status;
-        this.usersId = usersId;
     }
 
     public String getTitle() {
@@ -61,11 +59,4 @@ public class EventDTO {
         this.status = status;
     }
 
-    public List<Long> getUsersId() {
-        return usersId;
-    }
-
-    public void setUsersId(List<Long> usersId) {
-        this.usersId = usersId;
-    }
 }

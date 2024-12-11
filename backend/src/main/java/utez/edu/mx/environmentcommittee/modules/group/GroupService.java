@@ -72,9 +72,6 @@ public class GroupService {
             newGroup.setMunicipality(group.getMunicipality());
             newGroup.setNeighborhood(group.getNeighborhood());
             newGroup.setAdmin(userRepository.findById(group.getAdminId()).get());
-            if (group.getUsersId() != null) {
-                newGroup.setUsers(userRepository.findAllById(group.getUsersId()));
-            }
 
             groupRepository.save(newGroup);
             return customResponseEntity.getOkResponse("Grupo registrado correctamente", "CREATED", 201, null);
@@ -100,10 +97,6 @@ public class GroupService {
             groupToUpdate.setNeighborhood(group.getNeighborhood());
 
             // Nota: No actualizamos el campo "admin" aquí.
-
-            if (group.getUsersId() != null && !group.getUsersId().isEmpty()) {
-                groupToUpdate.setUsers(userRepository.findAllById(group.getUsersId()));
-            }
 
             groupRepository.save(groupToUpdate);
             return customResponseEntity.getOkResponse("Grupo actualizado con éxito", "OK", 200, null);

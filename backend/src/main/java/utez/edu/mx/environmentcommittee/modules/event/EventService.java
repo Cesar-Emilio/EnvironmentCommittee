@@ -72,10 +72,6 @@ public class EventService {
                 event.setStatus(dto.getStatus());
             }
 
-            if(dto.getUsersId() != null && !dto.getUsersId().isEmpty()) {
-                event.setUsers(userRepository.findAllById(dto.getUsersId()));
-            }
-
             eventRepository.save(event);
             return customResponseEntity.getOkResponse("Evento registrado correctamente", "CREATED", 201, null);
         } catch (Exception e) {
@@ -107,10 +103,6 @@ public class EventService {
         }
         if (dto.getStatus() != null && !dto.getStatus().isEmpty()) {
             event.setStatus(dto.getStatus());
-        }
-
-        if(dto.getUsersId() != null && !dto.getUsersId().isEmpty()) {
-            event.setUsers(userRepository.findAllById(dto.getUsersId()));
         }
 
         eventRepository.save(event);
@@ -150,7 +142,7 @@ public class EventService {
     }
 
     // VALIDATE TYPE
-    private boolean isTypeValid(long typeId) {
+    private boolean isTypeValid(Long typeId) {
         return typeRepository.existsById(typeId);
     }
 }

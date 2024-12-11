@@ -1,5 +1,6 @@
 package utez.edu.mx.environmentcommittee.auth;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthLoginDTO authLoginDTO) {
+    public ResponseEntity<?> login(@Valid @RequestBody AuthLoginDTO authLoginDTO) {
         return authService.login(authLoginDTO);
     }
 

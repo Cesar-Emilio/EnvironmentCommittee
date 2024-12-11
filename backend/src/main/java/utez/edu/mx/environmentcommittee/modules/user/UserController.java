@@ -28,13 +28,13 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody User user) {
+    public ResponseEntity<?> save(@RequestBody UserDTO user) {
         return userService.save(user);
     }
 
-    @PutMapping
-    public ResponseEntity<?> update(@RequestBody User user) {
-        return userService.update(user);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@RequestBody UserDTO user, @PathVariable("id") Long id) {
+        return userService.update(user, id);
     }
 
     @DeleteMapping("/{id}")

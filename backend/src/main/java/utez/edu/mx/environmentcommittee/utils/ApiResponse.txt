@@ -28,47 +28,69 @@ Respuesta:
 }
 
 
-3. Creación de un grupo
-Ruta: post localhost:8080/api/group
-Body:
-{
-    "name":"Limpieza",
-    "municipality":"Zapata",
-    "neighborhood":"zapatata"
-}
-Respuesta:
-{
-    "code":201,
-    "message":"Grupo registrado correctamente",
-    "status":"CREATED"
-}
-Nota 1: Para poder crear un grupo, es necesario que exista al menos un tipo de evento registrado.
-Nota 2: La creación de un grupo necesita de un admin, sin embargo al iniciarlo no poseerá uno (Hasta que se actualice con el admin dado)
-Nota 3: Al igual que con el admin, el grupo requiere una lista de usuarios la cual se irá agregando según se registren nuevos usuarios. (Se agrega un método para agregar usuario).
-
-
-REGISTRO:
+3. Creación de un usuario
 Ruta: post localhost:8080/api/user
 Body:
 {
-    "name": "Juan",
-    "lastname": "Bodoque",
-    "phone": "1231231231",
-    "email": "juancarlosbodoque@example.com",
-    "username": "juan carlos",
+    "name": "Aldo",
+    "lastname": "Ruiz",
+    "phone": "1234567890",
+    "email": "20233tn001@utez.edu.mx",
+    "username": "DiteRuiz",
     "password": "123",
-    "group": {
-        "id": 1
+    "roleId": 1
+}
+Respuesta:
+{
+  "code": 200,
+  "data": {
+    "user": {
+      "role": {
+        "id": 1,
+        "name": "ADMIN"
+      },
+      "phone": "1234567890",
+      "name": "Aldo",
+      "id": 3,
+      "email": "20233tn001@utez.edu.mx",
+      "lastname": "Ruiz",
+      "username": "DiteRuiz"
     },
-    "role": {
-        "id": 1
-    }
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJEaXRlUnVpeiIsImV4cCI6MTczMzk0MzU2MywiaWF0IjoxNzMzOTA3NTYzfQ.YqBsKNEHEhEgJek3oRCzurvUlLZMmdksATSDsv9Q9rU"
+  },
+  "message": "Registro exitoso",
+  "status": "OK"
 }
 
-
-Ruta: get localhost:8080/api/auth/login
+4. Creación de un grupo
+Ruta: post localhost:8080/api/group
 Body:
 {
-    "username": "admin",
-    "password": "admin"
+    "name": "Limpieza",
+    "municipality": "Zapata",
+    "neighborhood": "zapatata",
+    "adminId": "3" //Se usa 3 pq ya lo repetí varias veces
 }
+Respuesta:
+{
+  "code": 201,
+  "message": "Grupo registrado correctamente",
+  "status": "CREATED"
+}
+
+5. Creación de un evento
+Ruta: post localhost:8080/api/event
+Body:
+{
+    "title": "Limpiar D4",
+    "date": "2024-12-11",
+    "typeId": 1
+}
+Respuesta:
+{
+  "code": 201,
+  "message": "Evento registrado correctamente",
+  "status": "CREATED"
+}
+
+Nota: El evento se crea sin usuarios, es el usuario el que se actualiza para poder unirse a un evento.

@@ -3,17 +3,22 @@ package utez.edu.mx.environmentcommittee.modules.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import utez.edu.mx.environmentcommittee.auth.AuthController;
 import utez.edu.mx.environmentcommittee.auth.AuthService;
 import utez.edu.mx.environmentcommittee.auth.DTO.AuthLoginDTO;
-import utez.edu.mx.environmentcommittee.modules.user.DTO.UserDTO;
+import utez.edu.mx.environmentcommittee.modules.group.GroupRepository;
+import utez.edu.mx.environmentcommittee.modules.role.Role;
+import utez.edu.mx.environmentcommittee.modules.role.RoleRepository;
 import utez.edu.mx.environmentcommittee.utils.CustomResponseEntity;
+import utez.edu.mx.environmentcommittee.utils.security.JWTUtil;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,25 +31,24 @@ public class UserService {
     @Autowired
     private CustomResponseEntity customResponseEntity;
 
+    @Autowired
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, CustomResponseEntity customResponseEntity, PasswordEncoder passwordEncoder) {
+    @Autowired
+    private final RoleRepository roleRepository;
+
+    @Autowired
+    private GroupRepository groupRepository;
+
+    @Autowired
+    private JWTUtil jwtUtil;
+
+    public UserService(UserRepository userRepository, CustomResponseEntity customResponseEntity, PasswordEncoder passwordEncoder, RoleRepository roleRepository, GroupRepository groupRepository) {
         this.userRepository = userRepository;
         this.customResponseEntity = customResponseEntity;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    private UserDTO transformUserToDTO(User u) {
-        return new UserDTO(
-                u.getId(),
-                u.getName(),
-                u.getLastname(),
-                u.getPhone(),
-                u.getEmail(),
-                u.getUsername(),
-                u.getRole(),
-                u.getGroup() != null ? u.getGroup().getName() : "No asignado"
-        );
+        this.roleRepository = roleRepository;
+        this.groupRepository = groupRepository;
     }
 
 
@@ -55,11 +59,7 @@ public class UserService {
             return customResponseEntity.getOkResponse("No se encontraron usuarios", "OK", 200, null);
         }
 
-        List<UserDTO> userDtos = users.stream()
-                .map(this::transformUserToDTO)
-                .collect(Collectors.toList());
-
-        return customResponseEntity.getOkResponse("Usuarios encontrados", "OK", 200, userDtos);
+        return customResponseEntity.getOkResponse("Usuarios encontrados", "OK", 200, users);
     }
 
     @Transactional(readOnly = true)
@@ -69,8 +69,7 @@ public class UserService {
             return customResponseEntity.get404Response();
         }
 
-        UserDTO userDto = transformUserToDTO(user.get());
-        return customResponseEntity.getOkResponse("Usuario encontrado", "OK", 200, userDto);
+        return customResponseEntity.getOkResponse("Usuario encontrado", "OK", 200, user);
     }
 
     @Transactional(readOnly = true)
@@ -80,21 +79,42 @@ public class UserService {
             return customResponseEntity.getOkResponse("No se encontraron usuarios para este rol", "OK", 200, null);
         }
 
-        List<UserDTO> userDtos = users.stream()
-                .map(this::transformUserToDTO)
-                .collect(Collectors.toList());
-
-        return customResponseEntity.getOkResponse("Usuarios encontrados", "OK", 200, userDtos);
+        return customResponseEntity.getOkResponse("Usuarios encontrados", "OK", 200, users);
     }
 
     //Al usarse para el registro de usuario, debe retornar el token de acceso del método login
+    //Nota 2: Supondré que este es el método que se encarga de registrar un usuario
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<?> save(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
+    public ResponseEntity<?> save(UserDTO dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("El correo electrónico ya está registrado");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+
+        user.setName(dto.getName());
+        user.setLastname(dto.getLastname());
+        user.setPhone(dto.getPhone());
+        user.setEmail(dto.getEmail());
+        user.setUsername(dto.getUsername());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+
+        if (isRoleIdValid(dto.getRoleId())) {
+            user.setRole(roleRepository.findById(dto.getRoleId()).get());
+        } else {
+            return customResponseEntity.get404Response("No se encontró el rol con el ID proporcionado");
+        }
+
+        //Suponer que un usuario empieza sin grupo al registrarse
+        if (dto.getGroupId() != null) {
+            if (isGroupIdValid(dto.getGroupId())) {
+                user.setGroup(groupRepository.findById(dto.getGroupId()).get());
+                userRepository.save(user);
+            } else {
+                return customResponseEntity.get404Response("No se encontró el grupo con el ID proporcionado");
+            }
+        }
+
         user = userRepository.saveAndFlush(user);
 
         if (user == null) {
@@ -102,16 +122,37 @@ public class UserService {
                     .body("Error al registrar el usuario");
         }
 
-        AuthLoginDTO authLoginDTO = new AuthLoginDTO();
-        authLoginDTO.setUser(user.getEmail());
-        authLoginDTO.setPassword(user.getPassword());
-        return new AuthService().login(authLoginDTO);
+        UserDetails userDetails = new UserDetailsImpl(user);
+        String jwt = jwtUtil.generateToken(userDetails);
+
+        Map<String, Object> userResponse = new HashMap<>();
+        userResponse.put("id", user.getId());
+        userResponse.put("name", user.getName());
+        userResponse.put("lastname", user.getLastname());
+        userResponse.put("username", user.getUsername());
+        userResponse.put("email", user.getEmail());
+        userResponse.put("phone", user.getPhone());
+        userResponse.put("role", user.getRole());
+        if (user.getGroup() != null) {
+            userResponse.put("group", user.getGroup());
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", jwt);
+        response.put("user", userResponse);
+
+        return customResponseEntity.getOkResponse(
+                "Registro exitoso",
+                "OK",
+                200,
+                response
+        );
     }
 
 
     @Transactional(rollbackFor = {SQLException.class, Exception.class})
-    public ResponseEntity<?> update(User user) {
-        User existingUser = userRepository.findById(user.getId());
+    public ResponseEntity<?> update(UserDTO user, Long id) {
+        User existingUser = userRepository.findById(id).orElse(null);
         if (existingUser == null) {
             return customResponseEntity.get404Response();
         }
@@ -125,16 +166,22 @@ public class UserService {
             existingUser.setUsername(user.getUsername());
 
             // Validar y asignar rol
-            if (user.getRole() != null && user.getRole().getId() > 0) {
-                existingUser.setRole(user.getRole());
+            if (isRoleIdValid(user.getRoleId())) {
+                existingUser.setRole(roleRepository.findById(user.getRoleId()).get());
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("El rol es obligatorio y debe contener un ID válido.");
+                return customResponseEntity.get404Response("No se encontró el rol con el ID proporcionado");
             }
 
             // Si la contraseña no está vacía, actualizarla
             if (user.getPassword() != null && !user.getPassword().isEmpty()) {
                 existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+
+            // Si el grupo es valido, asignarlo
+            if (isGroupIdValid(user.getGroupId())) {
+                existingUser.setGroup(groupRepository.findById(user.getGroupId()).get());
+            } else {
+                return customResponseEntity.get404Response("No se encontró el grupo con el ID proporcionado");
             }
 
             userRepository.save(existingUser);
@@ -160,5 +207,13 @@ public class UserService {
             e.printStackTrace();
             return customResponseEntity.get400Response();
         }
+    }
+
+    private boolean isRoleIdValid(Long roleId) {
+        return roleId != null && roleRepository.existsById(roleId);
+    }
+
+    private boolean isGroupIdValid(Long groupId) {
+        return groupId != null && groupRepository.existsById(groupId);
     }
 }

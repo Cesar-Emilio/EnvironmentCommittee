@@ -23,13 +23,13 @@ public class DataInitializer {
              * MEMBER: Miembro de grupo
              */
             if (roleRepository.findByName("ADMIN") == null) {
-                roleRepository.save(new Role("ROLE_ADMIN"));
+                roleRepository.save(new Role("ADMIN"));
             }
             if (roleRepository.findByName("ADMINGROUP") == null) {
                 roleRepository.save(new Role("ROLE_ADMIN"));
             }
             if (roleRepository.findByName("MEMBER") == null) {
-                roleRepository.save(new Role("ROLE_ADMIN"));
+                roleRepository.save(new Role("MEMBER"));
             }
         };
     }

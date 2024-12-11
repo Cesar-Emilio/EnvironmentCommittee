@@ -18,17 +18,21 @@ import java.util.Map;
 
 @Service
 public class AuthService {
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private CustomResponseEntity customResponseEntity;
 
-    @Autowired
     private JWTUtil jwtUtil;
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public AuthService(UserRepository userRepository, CustomResponseEntity customResponseEntity, JWTUtil jwtUtil, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.customResponseEntity = customResponseEntity;
+        this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Transactional(readOnly = true)
     public ResponseEntity<?> login(AuthLoginDTO authLoginDTO){

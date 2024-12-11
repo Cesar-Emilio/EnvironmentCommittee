@@ -1,33 +1,31 @@
-package utez.edu.mx.environmentcommittee.modules.user.DTO;
+package utez.edu.mx.environmentcommittee.modules.user;
 
 import utez.edu.mx.environmentcommittee.modules.role.Role;
 
 public class UserDTO {
-    private long id;
     private String name;
     private String lastname;
     private String phone;
     private String email;
     private String username;
-    private Role role;
-    private String group;
+    private String password;
+    private Long roleId;
+    private Long groupId;
 
     public UserDTO() {}
 
-    public UserDTO(long id, String name, String lastname, String phone, String email, String username, Role role, String group) {
-        this.id = id;
+    public UserDTO(String name, String lastname, String phone, String email, String username, String password, Long roleId, Long groupId) {
         this.name = name;
         this.lastname = lastname;
         this.phone = phone;
         this.email = email;
         this.username = username;
-        this.role = role;
-        this.group = group;
+        this.password = password;
+        this.roleId = roleId;
+        this.groupId = groupId;
     }
 
     // Getters and Setters
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -44,9 +42,12 @@ public class UserDTO {
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
-    public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getGroup() { return group; }
-    public void setGroup(String group) { this.group = group; }
+    public Long getRoleId() { return roleId; }
+    public void setRoleId(Long roleId) { this.roleId = roleId; }
+
+    public Long getGroupId() { return groupId; }
+    public void setGroupId(Long groupId) { this.groupId = groupId; }
 }
