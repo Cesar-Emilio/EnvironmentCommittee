@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utez.edu.mx.environmentcommittee.modules.type.TypeRepository;
+import utez.edu.mx.environmentcommittee.modules.user.UserRepository;
 import utez.edu.mx.environmentcommittee.utils.CustomResponseEntity;
 
 import java.sql.SQLException;
@@ -21,9 +22,13 @@ public class EventService {
     @Autowired
     private TypeRepository typeRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     // BRING ALL EVENTS
     public ResponseEntity<?> findAll() {
         List<Event> events = eventRepository.findAll();
+
         return customResponseEntity.getOkResponse("Eventos encontrados", "OK", 200, events);
     }
 
@@ -66,6 +71,11 @@ public class EventService {
             } else {
                 event.setStatus(dto.getStatus());
             }
+
+            if(dto.getUsersId() != null && !dto.getUsersId().isEmpty()) {
+                event.setUsers(userRepository.findAllById(dto.getUsersId()));
+            }
+
             eventRepository.save(event);
             return customResponseEntity.getOkResponse("Evento registrado correctamente", "CREATED", 201, null);
         } catch (Exception e) {
@@ -97,6 +107,10 @@ public class EventService {
         }
         if (dto.getStatus() != null && !dto.getStatus().isEmpty()) {
             event.setStatus(dto.getStatus());
+        }
+
+        if(dto.getUsersId() != null && !dto.getUsersId().isEmpty()) {
+            event.setUsers(userRepository.findAllById(dto.getUsersId()));
         }
 
         eventRepository.save(event);

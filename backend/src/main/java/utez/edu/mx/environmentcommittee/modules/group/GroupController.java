@@ -22,13 +22,13 @@ public class GroupController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> save(@RequestBody Group group) {
+    public ResponseEntity<?> save(@RequestBody GroupDTO group) {
         return groupService.save(group);
     }
 
-    @PutMapping("")
-    public ResponseEntity<?> update(@RequestBody Group group) {
-        return groupService.update(group);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@RequestBody GroupDTO group, @PathVariable("id") Long id) {
+        return groupService.update(group, id);
     }
 
     @DeleteMapping("/{id}")
