@@ -27,6 +27,53 @@ const apiRequest = async (endpoint, method = 'GET', data = null) => {
     }
 };
 
+// Función para cerrar sesión
+const logoutUser = () => {
+    Swal.fire({
+        title: "¿Cerrar sesión?",
+        text: "¿Estás seguro de que deseas cerrar sesión?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, cerrar sesión",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem("user");
+            localStorage.removeItem("token");
+            window.location.href = "../index.html";
+        }
+    });
+};
+
+
+// Redirigir al inicio del usuario según su rol
+const redirectToHome = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && user.role && user.role.name) {
+        const role = user.role.name;
+        switch (role) {
+            case "ADMIN":
+                window.location.href = "../admin_principal/index.html";
+                break;
+            case "ADMINGROUP":
+                window.location.href = "../admin_group/index.html";
+                break;
+            case "MEMBER":
+                window.location.href = "../member/index.html";
+                break;
+            default:
+                console.error("Rol desconocido. Redirigiendo a login.");
+                window.location.href = "../login.html";
+        }
+    } else {
+        console.error("Usuario no autenticado. Redirigiendo a login.");
+        window.location.href = "../login.html";
+    }
+};
+
+
 // Renderizar grupos
 const renderGroups = async () => {
     try {
@@ -111,5 +158,34 @@ const initializePage = () => {
 };
 
 document.addEventListener('DOMContentLoaded', initializePage);
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Botón de cerrar sesión
+    const logoutBtn = document.querySelector(".logout-btn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            logoutUser();
+        });
+    } else {
+        console.warn("Botón de cerrar sesión no encontrado.");
+    }
+
+    // Enlace de inicio (Home)
+    const homeLink = document.querySelector(".nav-link[href='../index.html']");
+    if (homeLink) {
+        homeLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            redirectToHome();
+        });
+    } else {
+        console.warn("Enlace de Home no encontrado.");
+    }
+});
+
+document.querySelector(".nav-link[href='../index.html']").addEventListener("click", (e) => {
+    e.preventDefault();
+    redirectToHome();
+});
 
 export { renderGroups, renderEvents, renderUsers };

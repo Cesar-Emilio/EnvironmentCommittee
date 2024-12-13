@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/group")
-@CrossOrigin(origins = {"*"})
+@CrossOrigin(origins = {""})
 public class GroupController {
     @Autowired
     private GroupService groupService;

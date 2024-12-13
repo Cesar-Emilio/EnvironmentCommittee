@@ -26,4 +26,6 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     @Query(value = "SELECT * FROM groupss WHERE municipality = :municipality", nativeQuery = true)
     List<Group> findByMunicipality(@Param("municipality") String municipality);
+
+    Optional<Group> findByUsersId(long userId);
 }

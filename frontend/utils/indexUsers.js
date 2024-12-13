@@ -1,126 +1,210 @@
+// URL base para la API
 const URL = 'http://localhost:8080';
-let eventList = [];
 
-// Obtener todos los eventos desde el servidor
-const findAllEvents = async () => {
+// Función genérica para manejar solicitudes API
+const apiRequest = async (endpoint, method = 'GET', data = null) => {
     try {
-        const response = await fetch(`${URL}/api/event`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
+        const token = localStorage.getItem('token');
+        const headers = {
+            "Content-Type": "application/json",
+            ...(token && { "Authorization": `Bearer ${token}` })
+        };
+
+        const response = await fetch(`${URL}${endpoint}`, {
+            method,
+            headers,
+            body: data ? JSON.stringify(data) : null
         });
-        const data = await response.json();
-        eventList = data.data || [];
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
     } catch (error) {
-        console.error("Error fetching events:", error);
+        console.error(`API Error (${method} ${endpoint}):`, error.message);
+        throw error;
     }
 };
 
-// Obtener la clase del estado del evento
-const getStatusBadgeClass = (status) => {
-    const statusClasses = {
-        "Próximamente": "bg-warning text-white",
-        "En ejecución": "bg-success text-white",
-        "Finalizado": "bg-secondary text-white",
-        "Aceptado": "bg-primary text-white",
-        "Declinado": "bg-danger text-white"
-    };
-    return statusClasses[status] || "bg-secondary text-white";
-};
-
-// Renderizar eventos como tarjetas
-const renderEventCards = async () => {
-    await findAllEvents(); // Obtener los eventos
-    const container = document.getElementById("eventCardsContainer");
-    container.innerHTML = eventList.length
-        ? eventList.map(event => `
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                <div class="card shadow border-success">
-                    <div class="card-body text-center">
-                        <div class="icon-card text-success">
-                            <i class="bi bi-leaf-fill"></i>
-                        </div>
-                        <h5 class="card-title mt-3">${event.title}</h5>
-                        <span class="badge ${getStatusBadgeClass(event.status)}">${event.status}</span>
-                        <p class="mt-3 mb-1"><strong>Fecha:</strong> ${event.date}</p>
-                        <p><strong>Tipo de Evento:</strong> ${event.type.name}</p>
-                        <div class="d-flex justify-content-center">
-                            <button class="btn btn-success btn-sm" onclick="acceptEvent(${event.id})">Aceptar</button>
-                            <button class="btn btn-danger btn-sm" onclick="declineEvent(${event.id})">Declinar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `).join("")
-        : `<div class="text-center mt-4"><p>No hay eventos registrados</p></div>`;
-};
-
-// Función para aceptar un evento
-const acceptEvent = async (id) => {
+// Función para cerrar sesión
+const logoutUser = () => {
     Swal.fire({
-        title: "¿Aceptar evento?",
-        text: "¿Estás seguro de aceptar este evento?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Sí, aceptar",
-        cancelButtonText: "Cancelar",
-        confirmButtonColor: "#28a745",
-        cancelButtonColor: "#d33"
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            try {
-                const response = await fetch(`${URL}/api/event/${id}`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ status: "Aceptado" })
-                });
-
-                if (response.ok) {
-                    Swal.fire("Aceptado", "Has aceptado el evento.", "success");
-                    renderEventCards();
-                } else {
-                    Swal.fire("Error", "No se pudo aceptar el evento.", "error");
-                }
-            } catch (error) {
-                Swal.fire("Error", "Ocurrió un problema al aceptar el evento.", "error");
-            }
-        }
-    });
-};
-
-// Función para declinar un evento
-const declineEvent = async (id) => {
-    Swal.fire({
-        title: "¿Declinar evento?",
-        text: "¿Estás seguro de declinar este evento?",
+        title: "¿Cerrar sesión?",
+        text: "¿Estás seguro de que deseas cerrar sesión?",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Sí, declinar",
+        confirmButtonText: "Sí, cerrar sesión",
         cancelButtonText: "Cancelar",
         confirmButtonColor: "#dc3545",
-        cancelButtonColor: "#3085d6"
-    }).then(async (result) => {
+        cancelButtonColor: "#6c757d"
+    }).then((result) => {
         if (result.isConfirmed) {
-            try {
-                const response = await fetch(`${URL}/api/event/${id}`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ status: "Declinado" })
-                });
-
-                if (response.ok) {
-                    Swal.fire("Declinado", "Has declinado el evento.", "success");
-                    renderEventCards();
-                } else {
-                    Swal.fire("Error", "No se pudo declinar el evento.", "error");
-                }
-            } catch (error) {
-                Swal.fire("Error", "Ocurrió un problema al declinar el evento.", "error");
-            }
+            localStorage.removeItem("user");
+            localStorage.removeItem("token");
+            window.location.href = "../index.html";
         }
     });
 };
 
-// Inicializar eventos
-document.addEventListener("DOMContentLoaded", () => {
-    renderEventCards();
+// Redirigir al inicio del usuario según su rol
+const redirectToHome = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+        const role = user.role.name;
+        switch (role) {
+            case "ADMIN":
+                window.location.href = "../admin_principal/index.html";
+                break;
+            case "ADMINGROUP":
+                window.location.href = "../admin_group/index.html";
+                break;
+            case "MEMBER":
+                window.location.href = "../member/index.html";
+                break;
+            default:
+                console.error("Rol desconocido: No se puede redirigir");
+        }
+    } else {
+        console.error("Usuario no autenticado");
+    }
+};
+
+// Función para iniciar sesión
+const loginUser = async (credentials) => {
+    try {
+        const response = await apiRequest('/api/auth/login', 'POST', credentials);
+        if (response.code === 200) {
+            const { user, token } = response.data;
+            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('token', token);
+            return { user, token };
+        } else {
+            throw new Error(response.message || 'Error desconocido al iniciar sesión');
+        }
+    } catch (error) {
+        console.error("Error en loginUser:", error);
+        throw error;
+    }
+};
+
+const updateUserProfile = async (updatedUser) => {
+    try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const response = await apiRequest(`/api/user/${user.id}`, 'PUT', updatedUser);
+        if (response) {
+            localStorage.setItem("user", JSON.stringify(response.data));
+            Swal.fire("Éxito", "Perfil actualizado correctamente.", "success");
+        }
+    } catch (error) {
+        Swal.fire("Error", "No se pudo actualizar el perfil.", "error");
+        console.error("Error al actualizar perfil:", error);
+    }
+};
+
+// Renderizar grupos
+const renderGroups = async () => {
+    try {
+        const response = await apiRequest('/api/group');
+        const groups = response.data || [];
+        const container = document.getElementById('groupContainer');
+        container.innerHTML = groups.length
+            ? groups.map(group => `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">${group.name}</h5>
+                            <p><strong>Municipio:</strong> ${group.municipality}</p>
+                            <p><strong>Colonia:</strong> ${group.neighborhood}</p>
+                        </div>
+                    </div>
+                </div>`).join('')
+            : '<p class="text-center">No hay grupos registrados.</p>';
+    } catch (error) {
+        console.error("Error al obtener grupos:", error);
+    }
+};
+
+// Renderizar eventos
+const renderEvents = async () => {
+    try {
+        const response = await apiRequest('/api/event');
+        const events = response.data || [];
+        const container = document.getElementById('eventContainer');
+        container.innerHTML = events.length
+            ? events.map(event => `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">${event.title}</h5>
+                            <p><strong>Fecha:</strong> ${event.date}</p>
+                            <p><strong>Estado:</strong> ${event.status}</p>
+                            <p><strong>Tipo:</strong> ${event.type.name}</p>
+                        </div>
+                    </div>
+                </div>`).join('')
+            : '<p class="text-center">No hay eventos registrados.</p>';
+    } catch (error) {
+        console.error("Error al obtener eventos:", error);
+    }
+};
+
+// Renderizar usuarios
+const renderUsers = async () => {
+    try {
+        const response = await apiRequest('/api/user');
+        const users = response.data || [];
+        const container = document.getElementById('userContainer');
+        container.innerHTML = users.length
+            ? users.map(user => `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">${user.name} ${user.lastname}</h5>
+                            <p><strong>Teléfono:</strong> ${user.phone}</p>
+                            <p><strong>Correo:</strong> ${user.email}</p>
+                            <p><strong>Rol:</strong> ${user.role.name}</p>
+                        </div>
+                    </div>
+                </div>`).join('')
+            : '<p class="text-center">No hay usuarios registrados.</p>';
+    } catch (error) {
+        console.error("Error al obtener usuarios:", error);
+    }
+};
+
+// Inicializar páginas
+const initializePage = () => {
+    const path = window.location.pathname;
+    if (path.includes('manage-groups.html')) {
+        renderGroups();
+    } else if (path.includes('manage-events.html')) {
+        renderEvents();
+    } else if (path.includes('manage-users.html')) {
+        renderUsers();
+    }
+};
+
+document.addEventListener('DOMContentLoaded', initializePage);
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializePage(); // Inicializa la página según su contenido
+
+    const logoutButton = document.querySelector(".logout-btn");
+    if (logoutButton) {
+        logoutButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            logoutUser();
+        });
+    }
+
+    const homeLink = document.querySelector(".nav-link[href='../index.html']");
+    if (homeLink) {
+        homeLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            redirectToHome();
+        });
+    }
 });
+
+export { logoutUser, updateUserProfile, renderGroups, renderEvents, renderUsers, loginUser };

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 public class AuthLoginDTO {
     @NotNull(message = "El usuario no puede ser nulo.")
     @Size(min = 1, message = "El usuario no puede estar vacío.")
-    private String user;
+    private String username;
 
     @NotNull(message = "La contraseña no puede ser nula.")
     @Size(min = 1, message = "La contraseña no puede estar vacía.")
@@ -14,9 +14,9 @@ public class AuthLoginDTO {
     public AuthLoginDTO() {
     }
 
-    public AuthLoginDTO(String password, String user) {
+    public AuthLoginDTO(String password, String username) {
         this.password = password;
-        this.user = user;
+        this.username = username;
     }
 
     public String getPassword() {
@@ -27,11 +27,11 @@ public class AuthLoginDTO {
         this.password = password;
     }
 
-    public String getUser() {
-        return user;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

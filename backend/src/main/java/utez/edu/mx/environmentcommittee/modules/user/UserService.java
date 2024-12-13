@@ -162,14 +162,15 @@ public class UserService {
             existingUser.setName(user.getName());
             existingUser.setLastname(user.getLastname());
             existingUser.setPhone(user.getPhone());
-            existingUser.setEmail(user.getEmail());
             existingUser.setUsername(user.getUsername());
 
             // Validar y asignar rol
-            if (isRoleIdValid(user.getRoleId())) {
-                existingUser.setRole(roleRepository.findById(user.getRoleId()).get());
-            } else {
-                return customResponseEntity.get404Response("No se encontró el rol con el ID proporcionado");
+            if (user.getRoleId() != null) {
+                if (isRoleIdValid(user.getRoleId())) {
+                    existingUser.setRole(roleRepository.findById(user.getRoleId()).get());
+                } else {
+                    return customResponseEntity.get404Response("No se encontró el rol con el ID proporcionado");
+                }
             }
 
             // Si la contraseña no está vacía, actualizarla
@@ -178,14 +179,16 @@ public class UserService {
             }
 
             // Si el grupo es valido, asignarlo
-            if (isGroupIdValid(user.getGroupId())) {
-                existingUser.setGroup(groupRepository.findById(user.getGroupId()).get());
-            } else {
-                return customResponseEntity.get404Response("No se encontró el grupo con el ID proporcionado");
+            if (user.getGroupId() != null) {
+                if (isGroupIdValid(user.getGroupId())) {
+                    existingUser.setGroup(groupRepository.findById(user.getGroupId()).get());
+                } else {
+                    return customResponseEntity.get404Response("No se encontró el grupo con el ID proporcionado");
+                }
             }
 
-            userRepository.save(existingUser);
-            return customResponseEntity.getOkResponse("Usuario actualizado correctamente", "OK", 200, null);
+            existingUser = userRepository.saveAndFlush(existingUser);
+            return customResponseEntity.getOkResponse("Usuario actualizado correctamente", "OK", 200, existingUser);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

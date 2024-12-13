@@ -26,7 +26,15 @@ const findAllAdmins = async () => {
         const data = await response.json();
 
         // Filtrar administradores no asignados
-        adminList = (data.data || []).filter(user => user.role?.id === 1 && !groupList.some(group => group.admin?.id === user.id));
+        adminList = (data.data || []).filter(user => user.role?.id === 2 && !groupList.some(group => group.admin?.id === user.id));
+        const adminSelect = document.getElementById("addAdminGroup");
+        if (adminList.length === 0) {
+            adminSelect.innerHTML = `<option value="" disabled selected>No hay administradores disponibles</option>`;
+        } else {
+            adminSelect.innerHTML = adminList.map(admin => `
+                <option value="${admin.id}">${admin.name} ${admin.lastname}</option>
+            `).join("");
+        }
     } catch (error) {
         console.error('Error al obtener administradores:', error);
     }
@@ -205,7 +213,7 @@ const saveGroupChanges = async () => {
         name,
         municipality,
         neighborhood,
-        admin: { id: parseInt(adminId) }, // El ID del admin permanece inmutable
+        admin: { id: parseInt(adminId) },
     };
 
     try {
@@ -228,7 +236,6 @@ const saveGroupChanges = async () => {
     }
 };
 
-// Cargar administradores en el modal de "Agregar Grupo"
 const loadAdminOptions = async () => {
     await findAllAdmins();
     const adminSelect = document.getElementById("addAdminGroup");
@@ -237,24 +244,34 @@ const loadAdminOptions = async () => {
     `).join("");
 };
 
-// Limpiar campos del modal "Agregar Grupo" al cerrarlo
-document.getElementById("addGroupModal").addEventListener("hidden.bs.modal", () => {
-    document.getElementById("addGroupName").value = "";
-    document.getElementById("addGroupMunicipio").value = "";
-    document.getElementById("addGroupNeighborhood").value = "";
-    document.getElementById("addAdminGroup").innerHTML = ""; // Limpia el select
+document.addEventListener("DOMContentLoaded", () => {
+    const addGroupModal = document.getElementById("addGroupModal");
+    const editGroupModal = document.getElementById("editGroupModal");
+
+    if (addGroupModal) {
+        addGroupModal.addEventListener("hidden.bs.modal", () => {
+            document.getElementById("addGroupName").value = "";
+            document.getElementById("addGroupMunicipio").value = "";
+            document.getElementById("addGroupNeighborhood").value = "";
+            document.getElementById("addAdminGroup").innerHTML = "";
+        });
+    }
+
+    if (editGroupModal) {
+        editGroupModal.addEventListener("hidden.bs.modal", () => {
+            document.getElementById("editGroupName").value = "";
+            document.getElementById("editGroupMunicipio").value = "";
+            document.getElementById("editGroupNeighborhood").value = "";
+            document.getElementById("editAdmin").innerHTML = ""; // Limpia el select
+        });
+    }
 });
 
-// Limpiar campos del modal "Editar Grupo" al cerrarlo
-document.getElementById("editGroupModal").addEventListener("hidden.bs.modal", () => {
-    document.getElementById("editGroupName").value = "";
-    document.getElementById("editGroupMunicipio").value = "";
-    document.getElementById("editGroupNeighborhood").value = "";
-    document.getElementById("editAdmin").innerHTML = ""; // Limpia el select
-});
 
 // Inicializar eventos
 document.addEventListener("DOMContentLoaded", () => {
     loadTable();
     loadAdminOptions(); // Cargar los administradores al inicializar
 });
+
+export { saveGroup, saveGroupChanges, deleteGroup, loadAdminOptions, loadGroup, loadTable, findAllAdmins, findAllGroups };

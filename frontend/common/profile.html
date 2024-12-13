@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="../utils/indexUsers.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <img src="../icons/ECO_VIDA_icon.png" alt="Logo" style="width: 2.5em; height: 2.5em;">
+            Comité Ambiental
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="../index.html">Home</a>
+              </li>
+              <li class="nav-item me-auto">
+                <a class="nav-link active" href="../common/profile.html"><i class="bi bi-person-fill"></i> Perfil</a>
+              </li>
+            </ul>
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link logout-btn" href="#"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Perfil de Usuario</h2>
+
+        <!-- Perfil del Usuario -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <p><strong>Nombre de Usuario:</strong> <span id="usernameDisplay"></span></p>
+                <p><strong>Nombre:</strong> <span id="nameDisplay"></span></p>
+                <p><strong>Apellido:</strong> <span id="lastnameDisplay"></span></p>
+                <p><strong>Teléfono:</strong> <span id="phoneDisplay"></span></p>
+                <p><strong>Rol:</strong> <span id="roleDisplay"></span></p>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#editProfileModal">Editar Perfil</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Perfil -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Editar Perfil de Usuario</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <div class="form-group">
+                            <label for="username">Nombre de Usuario</label>
+                            <input type="text" id="username" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Nombre</label>
+                            <input type="text" id="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastname">Apellido</label>
+                            <input type="text" id="lastname" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Teléfono</label>
+                            <input type="tel" id="phone" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Actualizar Perfil</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="module">
+        import { logoutUser, updateUserProfile } from '../utils/indexUsers.js';
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const logoutButton = document.querySelector(".logout-btn");
+            if (logoutButton) {
+                logoutButton.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    logoutUser();
+                });
+            }
+
+            const user = JSON.parse(localStorage.getItem("user"));
+
+            // Mostrar datos del usuario
+            document.getElementById("usernameDisplay").textContent = user.username || 'No disponible';
+            document.getElementById("nameDisplay").textContent = user.name || 'No disponible';
+            document.getElementById("lastnameDisplay").textContent = user.lastname || 'No disponible';
+            document.getElementById("phoneDisplay").textContent = user.phone || 'No disponible';
+            document.getElementById("roleDisplay").textContent = user.role.name || 'No disponible';
+
+            // Prellenar formulario
+            document.getElementById("username").value = user.username || '';
+            document.getElementById("name").value = user.name || '';
+            document.getElementById("lastname").value = user.lastname || '';
+            document.getElementById("phone").value = user.phone || '';
+
+            // Manejo del formulario de edición
+            document.getElementById("editUserForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const updatedUser = {
+                    username: document.getElementById("username").value,
+                    name: document.getElementById("name").value,
+                    lastname: document.getElementById("lastname").value,
+                    phone: document.getElementById("phone").value
+                };
+
+                await updateUserProfile(updatedUser);
+
+                // Recargar los datos actualizados
+                const updatedData = JSON.parse(localStorage.getItem("user"));
+                document.getElementById("usernameDisplay").textContent = updatedData.username;
+                document.getElementById("nameDisplay").textContent = updatedData.name;
+                document.getElementById("lastnameDisplay").textContent = updatedData.lastname;
+                document.getElementById("phoneDisplay").textContent = updatedData.phone;
+
+                $('#editProfileModal').modal('hide');
+            });
+        });
+    </script>
+</body>
+</html>
