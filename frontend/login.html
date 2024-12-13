@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #27b485, #117554);
+            color: #333;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-container h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #27b485;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #27b485 , #117554);
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1f906a, #117652);
+        }
+
+        .error-message {
+            color: #d9534f;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container mx-auto">
+        <h1>Inicia Sesión</h1>
+        <div class="mb-3">
+            <input type="email" id="email" class="form-control" placeholder="Email" required>
+        </div>
+        <div class="mb-3">
+            <input type="password" id="password" class="form-control" placeholder="Password" required>
+        </div>
+        <button class="btn btn-primary w-100" onclick="login()">Inicia Sesión</button>
+        <p class="error-message" id="error-message"></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api/user/login'; // Cambia la URL sesa
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+
+            if (!email || !password) {
+                errorMessage.textContent = 'Por favor, completa todos los campos.';
+                return;
+            }
+
+            const payload = { email, password };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('Login exitoso: ' + JSON.stringify(data));
+                    // Redirige al dashboard o guarda el token de autenticación aquí.
+                } else {
+                    errorMessage.textContent = 'Credenciales inválidas.';
+                }
+            } catch (error) {
+                console.error('Error en el login:', error);
+                errorMessage.textContent = 'Ocurrió un error. Inténtalo de nuevo.';
+            }
+        }
+    </script>
+</body>
+</html>
