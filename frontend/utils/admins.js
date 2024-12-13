@@ -112,4 +112,4 @@ const initializePage = () => {
 
 document.addEventListener('DOMContentLoaded', initializePage);
 
-export { renderGroups, renderEvents, renderUsers };
+export { renderGroups, renderEvents, renderUsers, apiRequest };

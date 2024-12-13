@@ -27,6 +27,25 @@ const apiRequest = async (endpoint, method = 'GET', data = null) => {
     }
 };
 
+// Función para guardar un nuevo usuario
+const saveUser = async (email, password) => {
+    try {
+        const data = { email, password };
+        const response = await apiRequest('/api/user', 'POST', data);
+
+        if (response) {
+            Swal.fire("Éxito", "Usuario guardado correctamente.", "success");
+            return response;
+        } else {
+            throw new Error('No se pudo guardar el usuario.');
+        }
+    } catch (error) {
+        Swal.fire("Error", "Ocurrió un error al guardar el usuario.", "error");
+        console.error("Error en saveUser:", error);
+    }
+};
+
+
 // Función para cerrar sesión
 const logoutUser = () => {
     Swal.fire({
@@ -156,22 +175,24 @@ const renderUsers = async () => {
         const users = response.data || [];
         const container = document.getElementById('userContainer');
         container.innerHTML = users.length
-            ? users.map(user => `
-                <div class="col-md-6 col-lg-4">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <h5 class="card-title">${user.name} ${user.lastname}</h5>
-                            <p><strong>Teléfono:</strong> ${user.phone}</p>
-                            <p><strong>Correo:</strong> ${user.email}</p>
-                            <p><strong>Rol:</strong> ${user.role.name}</p>
-                        </div>
-                    </div>
-                </div>`).join('')
-            : '<p class="text-center">No hay usuarios registrados.</p>';
+            ? users.map((user, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${user.name} ${user.lastname}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone}</td>
+                    <td>${user.role.name}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('')
+            : '<tr><td colspan="6" class="text-center">No hay usuarios registrados.</td></tr>';
     } catch (error) {
         console.error("Error al obtener usuarios:", error);
     }
 };
+
 
 // Inicializar páginas
 const initializePage = () => {
@@ -207,4 +228,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-export { logoutUser, updateUserProfile, renderGroups, renderEvents, renderUsers, loginUser };
+export { apiRequest, logoutUser, updateUserProfile, renderGroups, renderEvents, renderUsers, loginUser };

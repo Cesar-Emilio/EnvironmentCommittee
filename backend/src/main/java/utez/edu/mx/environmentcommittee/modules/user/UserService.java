@@ -91,29 +91,9 @@ public class UserService {
                     .body("El correo electrónico ya está registrado");
         }
         User user = new User();
-
-        user.setName(dto.getName());
-        user.setLastname(dto.getLastname());
-        user.setPhone(dto.getPhone());
         user.setEmail(dto.getEmail());
-        user.setUsername(dto.getUsername());
+        user.setUsername(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-
-        if (isRoleIdValid(dto.getRoleId())) {
-            user.setRole(roleRepository.findById(dto.getRoleId()).get());
-        } else {
-            return customResponseEntity.get404Response("No se encontró el rol con el ID proporcionado");
-        }
-
-        //Suponer que un usuario empieza sin grupo al registrarse
-        if (dto.getGroupId() != null) {
-            if (isGroupIdValid(dto.getGroupId())) {
-                user.setGroup(groupRepository.findById(dto.getGroupId()).get());
-                userRepository.save(user);
-            } else {
-                return customResponseEntity.get404Response("No se encontró el grupo con el ID proporcionado");
-            }
-        }
 
         user = userRepository.saveAndFlush(user);
 
@@ -122,30 +102,11 @@ public class UserService {
                     .body("Error al registrar el usuario");
         }
 
-        UserDetails userDetails = new UserDetailsImpl(user);
-        String jwt = jwtUtil.generateToken(userDetails);
-
-        Map<String, Object> userResponse = new HashMap<>();
-        userResponse.put("id", user.getId());
-        userResponse.put("name", user.getName());
-        userResponse.put("lastname", user.getLastname());
-        userResponse.put("username", user.getUsername());
-        userResponse.put("email", user.getEmail());
-        userResponse.put("phone", user.getPhone());
-        userResponse.put("role", user.getRole());
-        if (user.getGroup() != null) {
-            userResponse.put("group", user.getGroup());
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("token", jwt);
-        response.put("user", userResponse);
-
         return customResponseEntity.getOkResponse(
                 "Registro exitoso",
                 "OK",
                 200,
-                response
+                null
         );
     }
 

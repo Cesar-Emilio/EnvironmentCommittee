@@ -15,13 +15,13 @@ public class User {
         @Column(name = "id", nullable = false)
         private long id;
 
-        @Column(name = "name", nullable = false)
+        @Column(name = "name")
         private String name;
 
-        @Column(name = "lastname", nullable = false)
+        @Column(name = "lastname")
         private String lastname;
 
-        @Column(name = "phone", nullable = false)
+        @Column(name = "phone")
         private String phone;
 
         @Column(name = "email", nullable = false, unique = true)
@@ -39,7 +39,7 @@ public class User {
         private Group group;
 
         @ManyToOne
-        @JoinColumn(name = "role_id", nullable = false)
+        @JoinColumn(name = "role_id")
         private Role role;
 
         public long getId() { return id; }

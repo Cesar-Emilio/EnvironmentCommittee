@@ -6,6 +6,7 @@
     <title>Gestión de Usuarios</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script defer src="../utils/indexUsers.js" type="module"></script>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-success">
@@ -28,17 +29,153 @@
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+            <a class="nav-link logout-btn" href="#"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
           </li>
         </ul>
       </div>
     </div>
   </nav>
 
-    <!-- Contenido principal -->
+  <div class="container mt-4">
+    <h1 class="text-center">Gestión de Usuarios</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Lista de Usuarios</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">Añadir Usuario</button>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../utils/admins.js" type="module" defer></script>
-<script src="../utils/nav.js" type="module" defer></script>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="userContainer">
+          <!-- Filas dinámicas cargadas por JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal para agregar usuario -->
+  <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addUserModalLabel">Añadir Usuario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addUserForm">
+            <div class="mb-3">
+              <label for="userEmail" class="form-label">Correo</label>
+              <input type="email" class="form-control" id="userEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="userPassword" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" id="userPassword" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" onclick="handleAddUser()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { renderUsers, logoutUser, apiRequest } from "../utils/indexUsers.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderUsersFiltered();
+
+      const logoutButton = document.querySelector(".logout-btn");
+      if (logoutButton) {
+        logoutButton.addEventListener("click", (e) => {
+          e.preventDefault();
+          logoutUser();
+        });
+      }
+    });
+
+    async function renderUsersFiltered() {
+        try {
+        const response = await apiRequest('/api/user');
+        const users = response.data || [];
+
+        // Filtrar usuarios para excluir a todos los ADMIN
+        const filteredUsers = users.filter(user => user.role.name !== 'ADMIN');
+
+        const container = document.getElementById('userContainer');
+        container.innerHTML = filteredUsers.length
+          ? filteredUsers.map((user, index) => `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${user.name ? user.name : 'No definido'} ${user.lastname ? user.lastname : 'No definido'}</td>
+                <td>${user.email ? user.email : 'No definido'}</td>
+                <td>${user.phone ? user.phone : 'No definido'}</td>
+                <td>${user.role.name ? user.role.name : 'No definido'}</td>
+                <td>
+                  <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Eliminar</button>
+                </td>
+              </tr>`).join('')
+          : '<tr><td colspan="6" class="text-center">No hay usuarios registrados.</td></tr>';
+      } catch (error) {
+        console.error("Error al obtener usuarios:", error);
+      }
+    }
+
+    window.handleAddUser = async function () {
+      const email = document.getElementById("userEmail").value;
+      const password = document.getElementById("userPassword").value;
+
+      if (email && password) {
+        try {
+          const data = { email, password };
+          await apiRequest('/api/user', 'POST', data);
+          Swal.fire("Éxito", "Usuario añadido correctamente.", "success");
+          renderUsersFiltered();
+          bootstrap.Modal.getInstance(document.getElementById("addUserModal")).hide();
+        } catch (error) {
+          Swal.fire("Error", "No se pudo añadir el usuario.", "error");
+        }
+      } else {
+        Swal.fire("Error", "Todos los campos son obligatorios.", "error");
+      }
+    };
+
+    async function deleteUser(userId) {
+      try {
+        const confirmation = await Swal.fire({
+          title: "¿Eliminar Usuario?",
+          text: "Esta acción no se puede deshacer.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Sí, eliminar",
+          cancelButtonText: "Cancelar",
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#6c757d",
+        });
+
+        if (confirmation.isConfirmed) {
+          await apiRequest(`/api/user/${userId}`, "DELETE");
+          Swal.fire("Eliminado", "El usuario ha sido eliminado.", "success");
+          renderUsersFiltered();
+        }
+      } catch (error) {
+        Swal.fire("Error", "No se pudo eliminar el usuario.", "error");
+        console.error("Error al eliminar usuario:", error);
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
